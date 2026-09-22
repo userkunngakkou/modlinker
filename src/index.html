@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ModLinker - MOD Sync Client</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="i18n.js"></script>
+    <script type="module" src="main.js" defer></script>
+  </head>
+
+  <body>
+    <!-- ── サイドバー ── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+            <line x1="12" y1="22.08" x2="12" y2="12"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>ModLinker</h1>
+          <span class="brand-tag" style="font-size: 11px;">V1.0.0 Early Access</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label" data-i18n="nav.mode">MODE</div>
+        <button class="nav-item active" id="nav-mode-sync">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span data-i18n="nav.download">ダウンロード</span>
+        </button>
+        <button class="nav-item" id="nav-mode-generate">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          <span data-i18n="nav.generate">マニフェスト生成</span>
+        </button>
+
+        <div class="nav-section-label" style="margin-top: 20px;" data-i18n="nav.settings_label">設定</div>
+        <button class="nav-item" id="nav-settings-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+          </svg>
+          <span data-i18n="nav.settings">設定</span>
+        </button>
+
+        <button class="nav-item" id="nav-about-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 16v-4"></path>
+            <path d="M12 8h.01"></path>
+          </svg>
+          <span data-i18n="nav.about">説明書</span>
+        </button>
+
+        <div class="nav-section-label" style="margin-top: 20px;" data-i18n="nav.theme_label">THEME</div>
+        <button class="nav-item" id="theme-toggle-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="theme-icon">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <span id="theme-text" data-i18n="nav.theme.light">ライトモード</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="status-indicator" id="status-indicator">
+          <div class="status-dot idle"></div>
+          <span data-i18n="status.idle">待機中</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── メインコンテンツ ── -->
+    <main class="main-content" id="main-content">
+      <header class="content-header">
+        <div class="header-title">
+          <h2 id="header-title-text" data-i18n="header.sync">MODダウンロード同期</h2>
+        </div>
+        <div class="header-badge">
+          <span class="badge" id="mod-count-badge">0 Files</span>
+        </div>
+      </header>
+
+      <!-- 共通: ディレクトリ設定 -->
+      <section class="control-panel glass-card" style="margin-bottom: 0;">
+        <div class="input-group">
+          <label for="game-path-input">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+            </svg>
+            <span data-i18n="common.game_dir">ゲームディレクトリ (.minecraft等)</span>
+          </label>
+          <div class="input-row">
+            <input type="text" id="game-path-input" placeholder="例: C:\Users\user\AppData\Roaming\.minecraft" data-i18n="common.game_dir_placeholder" data-i18n-attr="placeholder" spellcheck="false" />
+            <button class="btn-icon" id="browse-btn" title="フォルダを選択" data-i18n="common.browse" data-i18n-attr="title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h6a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="hint-text" data-i18n="common.game_dir_hint">※ mods/, tacz/, shaderpacks/ が対象。マニフェストはここに自動保存されます。</div>
+        </div>
+      </section>
+
+      <!-- 設定パネル (通常非表示) -->
+      <section id="panel-settings" class="mode-panel" style="display: none;">
+        <div class="control-panel glass-card">
+          <div class="input-group" style="flex: 1;">
+            <label>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4"/>
+              </svg>
+              CurseForge API Key (BYOK)
+            </label>
+            <div class="input-row">
+              <input type="password" id="cf-api-key-input" placeholder="$2a$10$... (任意・未入力でもOK)" data-i18n="settings.cf_key_placeholder" data-i18n-attr="placeholder" spellcheck="false" />
+              <button class="btn-icon" id="cf-key-save-btn" title="保存" data-i18n="common.save" data-i18n-attr="title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                  <polyline points="17 21 17 13 7 13 7 21"/>
+                  <polyline points="7 3 7 8 15 8"/>
+                </svg>
+              </button>
+              <button class="btn-icon" id="cf-key-clear-btn" title="クリア" data-i18n="common.clear" data-i18n-attr="title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="hint-text">
+              <span data-i18n="settings.cf_key_hint">Modrinth は常に使用されます。CurseForge は API キーを入力した場合のみ有効になります。</span><br>
+              <span data-i18n="settings.cf_key_link_prefix">キーは </span><a class="url-link" href="https://console.curseforge.com/" target="_blank">CurseForge for Studios</a> <span data-i18n="settings.cf_key_link_suffix">で取得できます。</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-panel glass-card">
+          <!-- R2 設定ウィザード (初心者向け) -->
+          <div class="input-group" style="flex: 1;">
+            <label style="display: flex; align-items: center; gap: 6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17.5 19c-2.3 0-4.5-1-5.5-2.5-1 1.5-3.2 2.5-5.5 2.5a5.5 5.5 0 1 1 0-11c0-4 3.5-7 7.5-7s7.5 3 7.5 7a5.5 5.5 0 1 1-4 11z"></path>
+              </svg>
+              <span data-i18n="settings.r2.title">Cloudflare R2 (非公式MODアップロード用)</span>
+            </label>
+            
+            <div class="tutorial-box" style="background: var(--surface-bg); padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; border: 1px solid var(--border-color); display: flex; justify-content: flex-start;">
+              <button class="btn-ghost" id="open-r2-guide-btn" style="color: var(--accent-color); font-weight: 600; display: flex; align-items: center; gap: 8px; border: 1px solid var(--accent-color); border-radius: 6px; padding: 6px 12px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+                <span data-i18n="settings.r2.guide_title">📖 R2 セットアップガイドを開く</span>
+              </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <input type="text" id="r2-account-id" placeholder="Account ID" spellcheck="false" />
+              <input type="text" id="r2-bucket" placeholder="Bucket Name" spellcheck="false" />
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+              <input type="password" id="r2-access-key" placeholder="Access Key ID" spellcheck="false" />
+              <input type="password" id="r2-secret-key" placeholder="Secret Access Key" spellcheck="false" />
+            </div>
+            <div class="input-row">
+              <input type="text" id="r2-public-url" placeholder="Public URL (例: https://pub-xxxx.r2.dev)" data-i18n="settings.r2.public_url_placeholder" data-i18n-attr="placeholder" spellcheck="false" />
+              <button class="btn-icon" id="r2-save-btn" title="保存" data-i18n="common.save" data-i18n-attr="title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                  <polyline points="17 21 17 13 7 13 7 21"/>
+                  <polyline points="7 3 7 8 15 8"/>
+                </svg>
+              </button>
+              <button class="btn-icon" id="r2-clear-btn" title="クリア" data-i18n="common.clear" data-i18n-attr="title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 言語設定 -->
+        <div class="control-panel glass-card">
+          <div class="input-group">
+            <label style="display: flex; align-items: center; gap: 6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+              <span data-i18n="settings.language">言語 / Language</span>
+            </label>
+            <div id="locale-custom-select-container"></div>
+            <!-- original select hidden -->
+            <select id="locale-select" style="display: none;"></select>
+          </div>
+        </div>
+      </section>
+
+      <!-- パネル1: ダウンロード (同期) モード -->
+      <section id="panel-sync" class="mode-panel active">
+        <div class="control-panel glass-card" style="display: block;">
+          <div style="display: flex; align-items: flex-end; gap: 16px; margin-bottom: 12px;">
+            <div class="input-group" style="flex: 1; min-width: 0;">
+              <label style="display: flex; align-items: center; gap: 6px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span data-i18n="sync.manifest_file">マニフェストファイル (JSON)</span>
+              </label>
+              <div class="input-row">
+                <input type="text" id="manifest-input" placeholder="ファイルが選択されていません" data-i18n="sync.manifest_placeholder" data-i18n-attr="placeholder" spellcheck="false" readonly style="cursor: pointer;" />
+                <button class="btn-icon" id="browse-manifest-btn" title="ファイルを選択" data-i18n="common.select_file" data-i18n-attr="title" style="flex-shrink: 0;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h6a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <button class="btn-primary" id="start-diff-btn" style="flex-shrink: 0; white-space: nowrap;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <span data-i18n="sync.check_diff">差分をチェック</span>
+            </button>
+          </div>
+          <label class="checkbox-label" style="cursor: pointer;">
+            <input type="checkbox" id="skip-r2-checkbox" />
+            <span data-i18n="sync.skip_r2">非公式リンク (R2等) からのDLをスキップする</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- 差分プレビュー -->
+      <section class="results-section glass-card" id="diff-section" style="display: none;">
+        <div class="section-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          </svg>
+          <span data-i18n="sync.diff_preview">ダウンロード対象プレビュー</span>
+          <button class="btn-primary" id="execute-download-btn" style="margin-left: auto; height: 32px; font-size: 12px; padding: 0 16px;">
+            <span data-i18n="sync.download_start">ダウンロード開始</span>
+          </button>
+        </div>
+        <div class="results-stats" id="diff-stats"></div>
+        <div class="table-wrapper">
+          <table class="results-table" id="diff-table">
+            <thead>
+              <tr>
+                <th data-i18n="results.col.dir">ディレクトリ</th>
+                <th>状態</th>
+                <th data-i18n="results.col.filename">ファイル名</th>
+                <th data-i18n="results.col.source">ソース</th>
+                <th data-i18n="results.col.url">DL URL</th>
+              </tr>
+            </thead>
+            <tbody id="diff-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- ダウンロード用 ログコンソール -->
+        <section class="log-section glass-card" id="log-section-sync" style="margin-top: 20px;">
+          <div class="section-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="4 17 10 11 4 5"/>
+              <line x1="12" y1="19" x2="20" y2="19"/>
+            </svg>
+            <span data-i18n="console.sync">コンソール (同期)</span>
+            <button class="btn-ghost" id="clear-log-btn-sync" data-i18n="console.clear">クリア</button>
+          </div>
+          <div class="log-console" id="log-console-sync">
+            <div class="log-entry info">
+              <span class="log-time">--:--:--</span>
+              <span class="log-msg">マニフェストファイルを読み込み、「差分をチェック」を押してください。</span>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- 手動ダウンロードリンク一覧 (Prism Launcher風) -->
+      <section class="results-section glass-card" id="manual-dl-section" style="display: none;">
+        <div class="section-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          <span data-i18n="sync.manual_dl_title">⚠ 手動ダウンロードが必要なMOD</span>
+        </div>
+        <div style="padding: 12px 16px; font-size: 12px; color: var(--text-secondary); border-bottom: 1px solid var(--glass-border);">
+          <span data-i18n="sync.manual_dl_desc">以下のMODはAPIからの自動DLが許可されていないため、ブラウザで手動ダウンロードしてください。</span>
+        </div>
+        <div id="manual-dl-list" style="padding: 8px 16px;"></div>
+      </section>
+
+      <!-- パネル2: マニフェスト生成モード -->
+      <section id="panel-generate" class="mode-panel">
+        <div class="control-panel glass-card">
+          <div class="input-group" style="flex: 1;">
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+              <span data-i18n="generate.desc">ローカルをスキャンし、Modrinth + CurseForge API と照合してマニフェストを作成します。</span><br>
+              <span data-i18n="generate.auto_save_prefix">結果は </span><code style="color: var(--accent-primary);">modlinker-manifest.json</code><span data-i18n="generate.auto_save_suffix"> に自動保存されます。</span>
+            </p>
+          </div>
+          <button class="btn-primary" id="start-generate-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            <span data-i18n="generate.start">スキャン開始</span>
+          </button>
+        </div>
+
+        <!-- スキャン用 ログコンソール -->
+        <section class="log-section glass-card" id="log-section-generate" style="margin-top: 20px;">
+          <div class="section-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="4 17 10 11 4 5"/>
+              <line x1="12" y1="19" x2="20" y2="19"/>
+            </svg>
+            <span data-i18n="console.scan">コンソール (スキャン)</span>
+            <button class="btn-ghost" id="clear-log-btn-generate" data-i18n="console.clear">クリア</button>
+          </div>
+          <div class="log-console" id="log-console-generate">
+            <div class="log-entry info">
+              <span class="log-time">--:--:--</span>
+              <span class="log-msg" data-i18n="console.initial">ゲームディレクトリを指定して操作を開始してください。</span>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- プログレスバー -->
+      <section class="progress-section" id="progress-section">
+        <div class="progress-header">
+          <span class="progress-label" id="progress-label" data-i18n="status.idle">待機中</span>
+          <span class="progress-percent" id="progress-percent">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+      </section>
+
+      <!-- プログレスバー -->
+      <section class="results-section glass-card" id="results-section" style="display: none;">
+        <div class="section-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          <span data-i18n="results.title">生成されたマニフェスト</span>
+          <div style="margin-left: auto; display: flex; gap: 8px;">
+            <button class="btn-ghost" id="save-manifest-btn" title="ファイルに保存" data-i18n="results.save">保存</button>
+            <button class="btn-ghost" id="export-manifest-btn" title="クリップボードにコピー" data-i18n="results.copy">コピー</button>
+          </div>
+        </div>
+        <div class="results-stats" id="results-stats"></div>
+        <div class="table-wrapper">
+          <table class="results-table" id="results-table">
+            <thead>
+              <tr>
+                <th data-i18n="results.col.dir">ディレクトリ</th>
+                <th data-i18n="results.col.source">ソース</th>
+                <th data-i18n="results.col.filename">ファイル名</th>
+                <th data-i18n="results.col.project">プロジェクト名</th>
+                <th data-i18n="results.col.url">DL URL</th>
+              </tr>
+            </thead>
+            <tbody id="results-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- R2 アップロード提案パネル -->
+      <section id="r2-upload-prompt" class="r2-upload-prompt glass-card" style="display: none;">
+        <div class="r2-upload-header">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <span id="r2-upload-title" data-i18n="r2_upload.title">未マッチのMODをR2にアップロードしますか？</span>
+        </div>
+        <p id="r2-upload-desc" class="r2-upload-desc"></p>
+        <div id="r2-upload-actions" class="r2-upload-actions"></div>
+      </section>
+    </main>
+  
+  <!-- R2 Setup Guide Modal -->
+  <div id="r2-guide-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" data-i18n="settings.r2.title">Cloudflare R2 (非公式MODアップロード用)</h3>
+        <button class="modal-close" id="close-r2-guide-btn" title="閉じる" data-i18n-attr="title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-sidebar" id="r2-guide-steps-list">
+          <div class="step-nav-item active" data-step="1">
+            <span class="step-nav-number">1</span>
+            <span data-i18n="settings.r2.step_nav_1">バケット作成</span>
+          </div>
+          <div class="step-nav-item" data-step="2">
+            <span class="step-nav-number">2</span>
+            <span data-i18n="settings.r2.step_nav_2">パブリックURL</span>
+          </div>
+          <div class="step-nav-item" data-step="3">
+            <span class="step-nav-number">3</span>
+            <span data-i18n="settings.r2.step_nav_3">CORS設定</span>
+          </div>
+          <div class="step-nav-item" data-step="4">
+            <span class="step-nav-number">4</span>
+            <span data-i18n="settings.r2.step_nav_4">APIトークン</span>
+          </div>
+        </div>
+        <div class="modal-main" id="r2-guide-content">
+          <!-- Step 1 -->
+          <div class="step-pane active" id="r2-step-1">
+            <p><span data-i18n="settings.r2.step1">1. Cloudflare ダッシュボードにログインし、「R2」を開きます。</span> <a class="url-link" href="https://dash.cloudflare.com/" target="_blank">Cloudflare ダッシュボード</a></p>
+            <p><span data-i18n="settings.r2.step2">2. <b>「バケットの作成」</b> から好きな名前 (例: <code>my-mod-repo</code>) で作成します。これが <b>Bucket Name</b> になります。</span></p>
+            <img class="step-image" src="../.user_uploaded/r2_step1_bucket_1790028689441.jpg" alt="Create Bucket" />
+          </div>
+          <!-- Step 2 -->
+          <div class="step-pane" id="r2-step-2">
+            <p><span data-i18n="settings.r2.step3">3. 作成したバケットの設定から <b>R2.dev サブドメイン</b> を「許可」にします。</span></p>
+            <p><span style="color: #ef4444; font-weight: bold;" data-i18n="settings.r2.step3_warn">※ 注意: これを許可すると、URLを知っている全員がMODをダウンロード可能になります。プライベートなファイルは置かないでください。</span></p>
+            <p><span data-i18n="settings.r2.step3_url">表示されたパブリックURL (<code>https://pub-xxxx.r2.dev</code> 等) が <b>Public URL</b> になります。</span></p>
+            <img class="step-image" src="../.user_uploaded/r2_step2_public_1790028699292.jpg" alt="Public URL" />
+          </div>
+          <!-- Step 3 -->
+          <div class="step-pane" id="r2-step-3">
+            <p><span data-i18n="settings.r2.step4">4. (重要) 設定画面の <b>CORS ポリシー</b> で「CORS ポリシーの追加」から以下を設定してください。これがないと他の人がダウンロードできません。</span></p>
+            <ul>
+              <li data-i18n="settings.r2.step4_origin">・許可されるオリジン: <code>*</code> または <code>tauri://localhost</code></li>
+              <li data-i18n="settings.r2.step4_method">・許可されるメソッド: <code>GET</code></li>
+            </ul>
+            <img class="step-image" src="../.user_uploaded/r2_step3_cors_1790028711406.jpg" alt="CORS Policy" />
+          </div>
+          <!-- Step 4 -->
+          <div class="step-pane" id="r2-step-4">
+            <p><span data-i18n="settings.r2.step5">5. R2トップページ右上の <b>R2 API トークンの管理</b> から「API トークンの作成」をします。</span></p>
+            <p><span data-i18n="settings.r2.step6">6. 「オブジェクト 読み取りと書き込み」権限で作成します。<br>表示された <b>アクセスキー ID</b> を <b>アクセスキー</b> の欄にコピーしてください。</span></p>
+            <p><span data-i18n="settings.r2.step7">7. 同様に <b>シークレットアクセスキー</b> をコピーして一番上の欄に貼り付けます。</span></p>
+            <img class="step-image" src="../.user_uploaded/r2_step4_token_1790028722004.jpg" alt="API Token" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="r2-guide-prev-btn" style="visibility: hidden;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span data-i18n="common.prev">前へ</span>
+        </button>
+        <button class="btn-primary" id="r2-guide-next-btn">
+          <span data-i18n="common.next">次へ</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- About/Help Modal -->
+  <div id="about-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" data-i18n="about.title">ModLinker の使い方</h3>
+        <button class="modal-close" id="close-about-btn" title="閉じる" data-i18n-attr="title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-sidebar" id="about-steps-list">
+          <div class="step-nav-item active about-step-item" data-step="1">
+            <span class="step-nav-number">1</span>
+            <span data-i18n="about.nav_1">はじめに</span>
+          </div>
+          <div class="step-nav-item about-step-item" data-step="2">
+            <span class="step-nav-number">2</span>
+            <span data-i18n="about.nav_2">ダウンロード機能</span>
+          </div>
+          <div class="step-nav-item about-step-item" data-step="3">
+            <span class="step-nav-number">3</span>
+            <span data-i18n="about.nav_3">マニフェスト生成機能</span>
+          </div>
+        </div>
+        <div class="modal-main" id="about-content">
+          <!-- Step 1 -->
+          <div class="step-pane about-pane active" id="about-step-1">
+            <h4 style="margin-top:0; margin-bottom:16px; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+              <span data-i18n="about.step1_title">ModLinker へようこそ！</span>
+            </h4>
+            <p style="line-height: 1.6; margin-bottom: 12px;"><span data-i18n="about.step1_1">ModLinkerは、お友達やサーバーのメンバーと一緒に、MinecraftのMOD構成をかんたんに揃えるためのツールです。</span></p>
+            <p style="line-height: 1.6;"><span data-i18n="about.step1_2">「マニフェストファイル (JSON)」という設計図をやり取りするだけで、みんなと同じMOD環境をすぐに作ることができます！</span></p>
+          </div>
+          
+          <!-- Step 2 -->
+          <div class="step-pane about-pane" id="about-step-2">
+            <h4 style="margin-top:0; margin-bottom:16px; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span data-i18n="about.step2_title">他の人の環境を取り込む（ダウンロード）</span>
+            </h4>
+            <p style="line-height: 1.6; margin-bottom: 16px;"><span data-i18n="about.step2_1">配られたマニフェストファイルを使って、必要なMODを一気にダウンロードします。</span></p>
+            <ul style="padding-left: 20px; line-height: 1.8; margin-bottom: 16px;">
+              <li><span data-i18n="about.step2_list1">📂 <b>ファイルを選ぶだけ</b>：複雑な操作は不要です。</span></li>
+              <li><span data-i18n="about.step2_list2">⚡ <b>差分だけをダウンロード</b>：すでに入っているMODはスキップするのでとても速いです。</span></li>
+            </ul>
+            <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(0,0,0,0.1);">
+              <span data-i18n="about.step2_note" style="color: var(--text-secondary); font-size: 13px;">💡 <b>ヒント：</b> 「ダウンロード」タブからJSONファイルを選び、「差分をチェック」を押すだけでOKです！</span>
+            </div>
+          </div>
+          
+          <!-- Step 3 -->
+          <div class="step-pane about-pane" id="about-step-3">
+            <h4 style="margin-top:0; margin-bottom:16px; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              <span data-i18n="about.step3_title">自分の環境を配る（マニフェスト生成）</span>
+            </h4>
+            <p style="line-height: 1.6; margin-bottom: 16px;"><span data-i18n="about.step3_1">今のあなたの「mods」フォルダの中身をリストアップし、みんなに配るための設計図を作ります。</span></p>
+            <ul style="padding-left: 20px; line-height: 1.8; margin-bottom: 16px;">
+              <li><span data-i18n="about.step3_list1">🌐 <b>公式MODは自動リンク</b>：Modrinth などの配布元を自動で特定します。</span></li>
+              <li><span data-i18n="about.step3_list2">☁️ <b>非公式MODはクラウドへ</b>：自作MODなどは Cloudflare R2 に自動でアップロードして共有できます。</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" id="about-prev-btn" style="visibility: hidden;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span data-i18n="common.prev">前へ</span>
+        </button>
+        <button class="btn-primary" id="about-next-btn">
+          <span data-i18n="common.next">次へ</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
