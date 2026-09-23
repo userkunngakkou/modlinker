@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>説明書 - ModLinker</title>
+  <meta name="description" content="ModLinkerの使い方。マニフェストの生成からダウンロード、Cloudflare R2の設定方法まで詳しく解説します。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+      </svg>
+      ModLinker
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">ホーム</a>
+      <a href="docs.html" class="active">説明書 (使い方)</a>
+      <a href="https://github.com/userkunngakkou/modlinker" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </nav>
+  </header>
+
+  <!-- Docs Layout -->
+  <section class="container" style="padding-top: 100px;">
+    
+    <div class="docs-layout">
+      
+      <!-- Sidebar -->
+      <aside class="docs-sidebar">
+        <nav class="docs-nav">
+          <button class="docs-nav-link active" data-target="docs-intro">はじめに</button>
+          <button class="docs-nav-link" data-target="docs-player">【プレイヤー】ダウンロード手順</button>
+          <button class="docs-nav-link" data-target="docs-creator">【制作者】マニフェスト生成</button>
+          <button class="docs-nav-link" data-target="docs-r2">【制作者】Cloudflare R2 設定</button>
+        </nav>
+      </aside>
+
+      <!-- Content Area -->
+      <main class="docs-content">
+        
+        <!-- はじめに -->
+        <div id="docs-intro" class="docs-section active">
+          <h2>ModLinker へようこそ</h2>
+          <p>ModLinkerは、お友達やサーバーのメンバーと一緒に、MinecraftのMOD構成をかんたんに揃えるためのツールです。</p>
+          <p>「マニフェストファイル (JSON)」という設計図をやり取りするだけで、みんなと同じMOD環境をすぐに作ることができます！</p>
+          <p>ZIPファイルでの配布とは違い、ModrinthやCurseForgeから直接ダウンロードするため著作権的にクリーンであり、配布の手間も大幅に削減されます。</p>
+        </div>
+
+        <!-- プレイヤー向け -->
+        <div id="docs-player" class="docs-section">
+          <h2>他の人の環境を取り込む（ダウンロード）</h2>
+          <p>サーバーの管理者やお友達から配られたマニフェストファイルを使って、必要なMODを一気にダウンロードします。</p>
+          
+          <h3>手順</h3>
+          <ol>
+            <li>アプリの左メニューから「ダウンロード」を選択します。</li>
+            <li>「ゲームディレクトリ」に、Minecraftのフォルダ（例: <code>.minecraft</code>）を設定します。</li>
+            <li>「マニフェストファイル」に、受け取った <code>manifest.json</code> を指定します。</li>
+            <li>「差分をチェック」ボタンを押します。</li>
+            <li>まだインストールされていないMODのリストが表示されるので、「ダウンロード開始」を押します。</li>
+          </ol>
+          <p>※すでに入っているMODはスキップするため、2回目以降の同期は一瞬で終わります。</p>
+        </div>
+
+        <!-- 制作者向け (マニフェスト生成) -->
+        <div id="docs-creator" class="docs-section">
+          <h2>自分の環境を共有する（マニフェスト生成）</h2>
+          <p>あなたの環境にあるMODリストから、共有用の設計図（JSONファイル）を作成します。</p>
+          
+          <h3>手順</h3>
+          <ol>
+            <li>アプリの左メニューから「マニフェスト生成」を選択します。</li>
+            <li>「ゲームディレクトリ」に、あなたのMinecraftのフォルダ（<code>mods/</code> などが入っている場所）を設定します。</li>
+            <li>「マニフェスト生成を開始」ボタンを押します。</li>
+            <li>アプリが自動的にローカルのMODをModrinthやCurseForgeと照合し、リストアップします。</li>
+            <li>「保存」ボタンを押して <code>manifest.json</code> を書き出し、お友達に共有してください。</li>
+          </ol>
+          <p>公式に存在しない野良MODなどがある場合は、Cloudflare R2を利用することで自動的にクラウドへアップロードし、ダウンロードURLを付与することが可能です。詳しくは次のセクションをご覧ください。</p>
+        </div>
+
+        <!-- 制作者向け (R2) -->
+        <div id="docs-r2" class="docs-section">
+          <h2>Cloudflare R2 の設定 (野良MODの配布)</h2>
+          <p>ModrinthにもCurseForgeにも無い独自のMODを配る場合、Cloudflare R2（毎月10GBまで無料）を利用して自動配布が可能です。</p>
+
+          <h3>1. バケットの作成</h3>
+          <p>Cloudflareダッシュボードにログインし、「R2」からバケットを作成します。</p>
+          
+          <h3>2. バケットの公開アクセス許可 (CORS設定)</h3>
+          <p>アプリがクラウドからMODをダウンロードできるように、CORSポリシーを設定します。</p>
+          <p>バケットの「設定」タブから「CORS ポリシー」を編集し、以下のJSONを貼り付けます。</p>
+          
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span class="code-lang">json</span>
+              <button class="copy-btn" data-copy-target="code-cors">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy
+              </button>
+            </div>
+            <pre><code id="code-cors">[
+  {
+    "AllowedOrigins": [
+      "*"
+    ],
+    "AllowedMethods": [
+      "GET"
+    ],
+    "AllowedHeaders": [
+      "*"
+    ],
+    "ExposeHeaders": []
+  }
+]</code></pre>
+          </div>
+
+          <h3>3. APIトークンの作成</h3>
+          <p>「R2 API トークンの管理」から新しいトークンを発行します。権限は「オブジェクト読み取りと書き込み」にしてください。</p>
+
+          <h3>4. ModLinker への設定</h3>
+          <p>ModLinkerの「設定」タブを開き、以下の情報を入力します。</p>
+          <ul>
+            <li><strong>Account ID</strong>: Cloudflareダッシュボード右下に表示されるID</li>
+            <li><strong>Bucket Name</strong>: 先ほど作成したバケット名</li>
+            <li><strong>Access Key ID</strong>: トークン作成時に表示されるアクセスキー</li>
+            <li><strong>Secret Access Key</strong>: トークン作成時に表示されるシークレットキー</li>
+            <li><strong>Public URL</strong>: バケットのカスタムドメイン、または r2.dev の公開URL</li>
+          </ul>
+
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span class="code-lang">text</span>
+              <button class="copy-btn" data-copy-target="code-url">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy
+              </button>
+            </div>
+            <pre><code id="code-url">https://pub-xxxxxxxxxxxxxxxx.r2.dev</code></pre>
+          </div>
+          
+          <p>これらを設定して保存すると、次回マニフェストを生成する際、見つからなかったMODが自動的にあなたのバケットへアップロードされます！</p>
+        </div>
+
+      </main>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="margin-top: auto;">
+    <div class="container">
+      <p>&copy; 2026 ModLinker Team. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

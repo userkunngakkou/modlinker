@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ModLinker - 最高のMOD同期ツール</title>
+  <meta name="description" content="ModLinkerはMinecraftのMOD構成をかんたんに同期・共有できるツールです。ZIP配布の手間を省き、合法かつスマートなMOD管理を実現します。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+      </svg>
+      ModLinker <span style="font-size: 12px; font-weight: normal; color: var(--text-secondary); background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; margin-left: 8px;">V1.0.0 Early Access</span>
+    </div>
+    <nav class="nav-links">
+      <a href="#features">機能紹介</a>
+      <a href="docs.html">説明書 (使い方)</a>
+      <a href="https://github.com/userkunngakkou/modlinker" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero container">
+    <div class="fade-in">
+      <h1>MODの共有を、<br>もっとスマートに、<span class="text-gradient">合法に。</span></h1>
+      <p class="subtitle">ZIPファイルで配るのはもうおしまい。<br>「マニフェスト(JSON)」だけを共有し、公式から直接一括ダウンロード。<br>野良MODもCloudflare R2でシームレスに同期。</p>
+      
+      <div class="hero-buttons">
+        <button class="btn btn-primary" onclick="window.location.href='#download'">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Windows版 ダウンロード
+        </button>
+        <button class="btn btn-secondary" onclick="window.location.href='docs.html'">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+          </svg>
+          説明書を読む
+        </button>
+      </div>
+    </div>
+
+    <div class="hero-mockup glass fade-in">
+      <img src="images/app-mockup.png" alt="ModLinker Application Interface" onerror="this.src='https://placehold.co/900x560/1a1d2d/ffffff?text=App+Mockup+Placeholder'">
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="container">
+    <h2 class="fade-in text-gradient" style="text-align: center;">なぜ ModLinker なのか？</h2>
+    <p class="fade-in subtitle" style="margin: 0 auto 40px; text-align: center;">マルチプレイやMODパックの共有で抱えていた課題を、すべて解決します。</p>
+
+    <div class="features-grid">
+      <!-- Feature 1 -->
+      <div class="feature-card glass fade-in">
+        <div class="feature-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        </div>
+        <h3>マニフェスト自動生成</h3>
+        <p>制作者はゲームフォルダを指定するだけ。自動でModrinthやCurseForgeのプロジェクトを特定し、共有用の設計図（JSON）を一瞬で作成します。</p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="feature-card glass fade-in">
+        <div class="feature-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="8 17 12 21 16 17"></polyline>
+            <line x1="12" y1="12" x2="12" y2="21"></line>
+            <path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"></path>
+          </svg>
+        </div>
+        <h3>差分一括ダウンロード</h3>
+        <p>プレイヤーは受け取ったJSONを読み込むだけ。足りないMODだけを高速で一括ダウンロードし、すぐに遊べる環境を構築します。</p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-card glass fade-in">
+        <div class="feature-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+          </svg>
+        </div>
+        <h3>Cloudflare R2 連携</h3>
+        <p>公式に存在しない「野良MOD」や自作MODも心配無用。制作者のCloudflare R2（無料枠）に自動アップロードし、シームレスに同期可能です。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download Section -->
+  <section id="download" class="container" style="text-align: center; padding-bottom: 150px;">
+    <div class="glass fade-in" style="padding: 60px 20px; border-radius: 24px; background: rgba(84, 104, 255, 0.05); border-color: rgba(84, 104, 255, 0.2);">
+      <h2 class="text-gradient">今すぐ新しいMOD共有を始めよう</h2>
+      <p class="subtitle" style="margin: 0 auto 40px;">完全無料でオープンソース。Windows、Mac、Linuxに対応しています。</p>
+      
+      <div class="hero-buttons">
+        <button class="btn btn-primary" onclick="window.open('https://github.com/userkunngakkou/modlinker/releases', '_blank')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          ダウンロードページ (GitHub)
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 ModLinker Team. All rights reserved.</p>
+      <p style="font-size: 14px; margin-top: 8px;">Not affiliated with Mojang AB or Microsoft.</p>
+    </div>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

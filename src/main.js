@@ -37,6 +37,7 @@ let manifestInput, skipR2Checkbox, startDiffBtn, browseManifestBtn;
 let diffSection, diffTbody, diffStats, executeDownloadBtn;
 let manualDlSection, manualDlList;
 let currentDiffTargets = [];
+let currentManualTargets = [];
 
 // 生成用
 let startGenerateBtn, saveManifestBtn;
@@ -184,9 +185,17 @@ window.addEventListener("DOMContentLoaded", async () => {
   // 動的テキストの更新用（モード切替時などに再適用する場合）
   function updateDynamicTexts() {
     updateThemeUI(document.documentElement.classList.contains("theme-light"));
-    if (executeDownloadBtn && currentDiffTargets.length > 0) {
-      const dlCount = currentDiffTargets.filter(d => d.action === "download").length;
-      executeDownloadBtn.textContent = dlCount === 0 ? window.i18n.t("sync.no_download") : window.i18n.t("sync.download_start", [dlCount]);
+    if (executeDownloadBtn) {
+      const dlCount = currentDiffTargets ? currentDiffTargets.filter(d => d.action === "download").length : 0;
+      const manualCount = typeof currentManualTargets !== 'undefined' ? currentManualTargets.length : 0;
+      
+      if (dlCount > 0) {
+        executeDownloadBtn.textContent = window.i18n ? window.i18n.t("sync.download_start", [dlCount]) : `ダウンロード開始 (${dlCount} 個)`;
+      } else if (manualCount > 0) {
+        executeDownloadBtn.textContent = window.i18n ? window.i18n.t("sync.manual_open", [manualCount]) || `手動DLページを開く (${manualCount} 個)` : `手動DLページを開く (${manualCount} 個)`;
+      } else {
+        executeDownloadBtn.textContent = window.i18n ? window.i18n.t("sync.no_download") : "ダウンロード不要";
+      }
     }
   }
 
@@ -204,6 +213,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   if (navModeSync) navModeSync.addEventListener("click", () => switchMode("sync"));
   if (navModeGenerate) navModeGenerate.addEventListener("click", () => switchMode("generate"));
   if (navSettingsBtn) navSettingsBtn.addEventListener("click", () => switchMode("settings"));
+  const navAboutBtn = document.getElementById("nav-about-btn");
+  if (navAboutBtn) navAboutBtn.addEventListener("click", () => switchMode("docs"));
 
   if (browseBtn) browseBtn.addEventListener("click", handleBrowse);
   if (browseManifestBtn) browseManifestBtn.addEventListener("click", handleBrowseManifest);
@@ -243,6 +254,36 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
   } catch (e) {
     console.warn("R2設定の読み込みスキップ:", e);
+  }
+
+  // --- Docs Navigation Logic ---
+  const docsNavItems = document.querySelectorAll('.docs-nav-item');
+  const docsContentArea = document.getElementById('docs-content-area');
+  
+  if (docsNavItems.length > 0 && docsContentArea) {
+    docsNavItems.forEach(item => {
+      item.addEventListener('click', () => {
+        // Remove active class from all
+        docsNavItems.forEach(n => n.classList.remove('active'));
+        // Add to clicked
+        item.classList.add('active');
+        
+        // Hide all sections, show target
+        const targetId = item.getAttribute('data-target');
+        const sections = document.querySelectorAll('.docs-section');
+        sections.forEach(sec => sec.classList.remove('active'));
+        
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) {
+          targetSection.classList.add('active');
+          docsContentArea.scrollTop = 0;
+        }
+      });
+    });
+    // Init first section
+    const firstTarget = docsNavItems[0].getAttribute('data-target');
+    const firstSection = document.getElementById(firstTarget);
+    if (firstSection) firstSection.classList.add('active');
   }
 });
 
@@ -323,21 +364,44 @@ function switchMode(mode) {
   navModeSync.classList.toggle("active", mode === "sync");
   navModeGenerate.classList.toggle("active", mode === "generate");
   navSettingsBtn.classList.toggle("active", mode === "settings");
+  const navAboutBtn = document.getElementById("nav-about-btn");
+  if (navAboutBtn) navAboutBtn.classList.toggle("active", mode === "docs");
 
   // 対象パネルを表示してGSAPでアニメーション
   let targetPanelId;
   if (mode === "sync") targetPanelId = "panel-sync";
   else if (mode === "generate") targetPanelId = "panel-generate";
   else if (mode === "settings") targetPanelId = "panel-settings";
+  else if (mode === "docs") targetPanelId = "panel-docs";
   
   const targetPanel = document.getElementById(targetPanelId);
   targetPanel.classList.add("active");
   targetPanel.style.display = "block"; // settings の初期非表示を上書き
   // アニメーションなしで即時表示
 
-  if (mode === "sync") headerTitleText.textContent = window.i18n ? window.i18n.t("header.sync_title") : "MODダウンロード同期";
-  else if (mode === "generate") headerTitleText.textContent = window.i18n ? window.i18n.t("header.generate_title") : "マニフェスト生成 (リスト抽出)";
-  else if (mode === "settings") headerTitleText.textContent = window.i18n ? window.i18n.t("nav.settings") : "設定";
+  if (mode === "sync") {
+    headerTitleText.setAttribute("data-i18n", "header.sync_title");
+    headerTitleText.textContent = window.i18n ? window.i18n.t("header.sync_title") : "MODダウンロード同期";
+  } else if (mode === "generate") {
+    headerTitleText.setAttribute("data-i18n", "header.generate_title");
+    headerTitleText.textContent = window.i18n ? window.i18n.t("header.generate_title") : "マニフェスト生成 (リスト抽出)";
+  } else if (mode === "settings") {
+    headerTitleText.setAttribute("data-i18n", "nav.settings");
+    headerTitleText.textContent = window.i18n ? window.i18n.t("nav.settings") : "設定";
+  } else if (mode === "docs") {
+    headerTitleText.removeAttribute("data-i18n");
+    headerTitleText.textContent = "ModLinker の使い方 (説明書)";
+  }
+
+  const commonGameDir = document.getElementById("common-game-dir");
+  const progressSection = document.getElementById("progress-section");
+  if (mode === "docs") {
+    if (commonGameDir) commonGameDir.style.display = "none";
+    if (progressSection) progressSection.style.display = "none";
+  } else {
+    if (commonGameDir) commonGameDir.style.display = "block";
+    if (progressSection) progressSection.style.display = "block";
+  }
 
   resultsSection.style.display = "none";
   if (diffSection) diffSection.style.display = "none";
@@ -402,7 +466,7 @@ async function handleBrowseManifest() {
       title: "マニフェストファイル (JSON) を選択"
     });
     if (selected) {
-      const content = await readTextFile(selected);
+      const content = await invoke("read_file_content", { path: selected });
       loadedManifestContent = content;
       manifestInput.value = selected;
       addLog(`マニフェストファイルを読み込みました: ${selected}`, "info");
@@ -465,6 +529,8 @@ async function handleGenerateManifest() {
     renderResults(manifest);
     loadedManifestContent = JSON.stringify(manifest, null, 2);
     manifestInput.value = "(自動生成されたマニフェスト)";
+
+    // ブラウザを開くプロンプトはダウンロード時のみ表示するため、ここでは何もしない
   } catch (err) {
     addLog(`✘ エラー: ${err}`, "error");
     updateProgress(0, "エラーが発生しました");
@@ -517,7 +583,7 @@ function renderDiffResults(diffResults) {
   diffSection.style.display = "block";
   diffTbody.innerHTML = "";
   currentDiffTargets = [];
-  const manualItems = [];
+  currentManualTargets = [];
 
   let dlCount = 0, skipCount = 0, upToDateCount = 0, manualCount = 0;
 
@@ -537,7 +603,7 @@ function renderDiffResults(diffResults) {
     } else if (entry.action === "manual") {
       statusBadge = `<span class="status-badge" style="background: rgba(255, 165, 0, 0.12); color: orange;">🔗 手動DL</span>`;
       manualCount++;
-      manualItems.push(entry);
+      currentManualTargets.push(entry);
     } else if (entry.action === "skip") {
       statusBadge = `<span class="status-badge" style="background: rgba(255, 165, 0, 0.12); color: orange;">⚠ スキップ</span>`;
       skipCount++;
@@ -581,15 +647,21 @@ function renderDiffResults(diffResults) {
     </div>
   `;
 
-  executeDownloadBtn.disabled = (dlCount === 0);
-  executeDownloadBtn.textContent = dlCount === 0 ? "ダウンロード不要" : `ダウンロード開始 (${dlCount} 個)`;
+  executeDownloadBtn.disabled = (dlCount === 0 && manualCount === 0);
+  if (dlCount > 0) {
+    executeDownloadBtn.textContent = `ダウンロード開始 (${dlCount} 個)`;
+  } else if (manualCount > 0) {
+    executeDownloadBtn.textContent = `手動DLページを開く (${manualCount} 個)`;
+  } else {
+    executeDownloadBtn.textContent = "ダウンロード不要";
+  }
 
   // gsap アニメーション削除
 
   // 手動DLリンク一覧
-  if (manualItems.length > 0) {
+  if (currentManualTargets.length > 0) {
     manualDlSection.style.display = "block";
-    manualDlList.innerHTML = manualItems.map(item => `
+    manualDlList.innerHTML = currentManualTargets.map(item => `
       <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--glass-border);">
         <span class="dir-badge">${escapeHtml(item.target_dir)}/</span>
         <span class="file-name-cell" style="flex: 1;">${escapeHtml(item.file_name)}</span>
@@ -605,24 +677,58 @@ function renderDiffResults(diffResults) {
 // ── 実際のダウンロード ──
 async function handleExecuteDownload() {
   const gamePath = gamePathInput.value.trim();
-  if (currentDiffTargets.length === 0) return;
+  if (currentDiffTargets.length === 0 && currentManualTargets.length === 0) return;
 
   if (isProcessing) return;
-  setProcessingState(executeDownloadBtn, true, "ダウンロード中...");
-  addLog(`ダウンロードを開始します（${currentDiffTargets.length} 個）`, "info");
+  setProcessingState(executeDownloadBtn, true, "処理中...");
 
-  try {
-    await invoke("execute_download", {
-      gamePath: gamePath,
-      targetsJson: JSON.stringify(currentDiffTargets)
-    });
-  } catch (err) {
-    addLog(`✘ ダウンロードエラー: ${err}`, "error");
-    updateProgress(0, "エラーが発生しました");
-    updateStatusDot("error");
-  } finally {
-    setProcessingState(executeDownloadBtn, false, "完了");
+  let hasError = false;
+
+  if (currentDiffTargets.length > 0) {
+    addLog(`ダウンロードを開始します（${currentDiffTargets.length} 個）`, "info");
+    try {
+      await invoke("execute_download", {
+        gamePath: gamePath,
+        targetsJson: JSON.stringify(currentDiffTargets)
+      });
+    } catch (err) {
+      addLog(`✘ ダウンロードエラー: ${err}`, "error");
+      updateProgress(0, "エラーが発生しました");
+      updateStatusDot("error");
+      hasError = true;
+    }
   }
+
+  if (!hasError && currentManualTargets.length > 0) {
+    const manualCount = currentManualTargets.filter(m => m.source === "manual").length;
+    const assistCount = currentManualTargets.filter(m => m.source === "unknown").length;
+    
+    let msg = "";
+    if (manualCount > 0) {
+      msg += `自動ダウンロードURLが取得できなかったMODが ${manualCount} 個あります。\n`;
+    }
+    if (assistCount > 0) {
+      msg += `【アシスト検索機能】見つからないMODが ${assistCount} 個あります。\n`;
+    }
+    msg += "\nブラウザで関連ページを開きますか？";
+      
+    if (confirm(msg)) {
+      addLog(`ブラウザで関連ページを開きます（計 ${currentManualTargets.length} 個）`, "info");
+      for (const item of currentManualTargets) {
+        if (item.page_url) {
+          try {
+            await invoke("open_browser", { url: item.page_url });
+          } catch(e) {
+            addLog(`ブラウザを開けませんでした: ${item.file_name}`, "error");
+          }
+        }
+      }
+    } else {
+      addLog("ブラウザの展開をスキップしました。", "info");
+    }
+  }
+
+  setProcessingState(executeDownloadBtn, false, "完了");
 }
 
 // ── ソースバッジ生成 ──
@@ -634,6 +740,8 @@ function makeSourceBadge(source) {
       return `<span class="status-badge" style="background: rgba(240, 100, 40, 0.12); color: #f06428;">CurseForge</span>`;
     case "manual":
       return `<span class="status-badge" style="background: rgba(255, 165, 0, 0.12); color: orange;">手動DL</span>`;
+    case "unknown":
+      return `<span class="status-badge" style="background: rgba(128, 128, 128, 0.12); color: var(--text-muted);">アシスト検索</span>`;
     default:
       return `<span class="status-badge" style="background: rgba(128, 128, 128, 0.12); color: var(--text-muted);">不明</span>`;
   }
@@ -752,7 +860,7 @@ function renderResults(manifest) {
     </div>
     <div class="stat-item">
       <span class="stat-dot unmatched"></span>
-      <span class="stat-label">不明:</span>
+      <span class="stat-label">アシスト検索:</span>
       <span class="stat-value">${unknownCount}</span>
     </div>
   `;
@@ -888,170 +996,22 @@ function escapeHtml(text) {
 
 
 window.addEventListener("DOMContentLoaded", () => {
-  // --- Modal Logic ---
-  const r2GuideModal = document.getElementById("r2-guide-modal");
-  const openR2GuideBtn = document.getElementById("open-r2-guide-btn");
-  const closeR2GuideBtn = document.getElementById("close-r2-guide-btn");
-  const r2GuidePrevBtn = document.getElementById("r2-guide-prev-btn");
-  const r2GuideNextBtn = document.getElementById("r2-guide-next-btn");
-  const stepNavItems = document.querySelectorAll(".step-nav-item");
-  const stepPanes = document.querySelectorAll(".step-pane");
-  let currentStep = 1;
-  const maxStep = 4;
-
-  if (openR2GuideBtn && r2GuideModal) {
-    openR2GuideBtn.addEventListener("click", () => {
-      r2GuideModal.classList.add("show");
-      setStep(1);
-    });
-
-    closeR2GuideBtn.addEventListener("click", () => {
-      r2GuideModal.classList.remove("show");
-    });
-
-    r2GuideModal.addEventListener("click", (e) => {
-      if (e.target === r2GuideModal) {
-        r2GuideModal.classList.remove("show");
-      }
-    });
-
-    r2GuideNextBtn.addEventListener("click", () => {
-      if (currentStep < maxStep) {
-        setStep(currentStep + 1);
-      } else {
-        r2GuideModal.classList.remove("show");
-      }
-    });
-
-    r2GuidePrevBtn.addEventListener("click", () => {
-      if (currentStep > 1) {
-        setStep(currentStep - 1);
-      }
-    });
-
-    stepNavItems.forEach(item => {
-      item.addEventListener("click", () => {
-        setStep(parseInt(item.dataset.step));
-      });
-    });
-
-    function setStep(step) {
-      currentStep = step;
-      stepNavItems.forEach(item => {
-        if(parseInt(item.dataset.step) === step) {
-          item.classList.add("active");
-        } else {
-          item.classList.remove("active");
+  // --- Copy Button Logic ---
+  document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".copy-btn");
+    if (btn) {
+      const textToCopy = btn.getAttribute("data-copy");
+      if (textToCopy) {
+        try {
+          await navigator.clipboard.writeText(textToCopy);
+          const originalText = btn.textContent;
+          btn.textContent = window.i18n ? window.i18n.t("common.copied") : "コピーしました！";
+          setTimeout(() => { btn.textContent = originalText; }, 2000);
+        } catch (err) {
+          console.error("Failed to copy text: ", err);
         }
-      });
-      stepPanes.forEach(pane => {
-        if(pane.id === `r2-step-${step}`) {
-          pane.classList.add("active");
-        } else {
-          pane.classList.remove("active");
-        }
-      });
-      r2GuidePrevBtn.style.visibility = step === 1 ? "hidden" : "visible";
-      
-      if (step === maxStep) {
-        r2GuideNextBtn.innerHTML = '<span data-i18n="common.close">閉じる</span>';
-      } else {
-        r2GuideNextBtn.innerHTML = '<span data-i18n="common.next">次へ</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>';
-      }
-      
-      if (window.i18n && window.i18n.applyLocale) {
-        window.i18n.applyLocale();
       }
     }
-  }
+  });
 
-  // --- About Modal Logic ---
-  const aboutModal = document.getElementById("about-modal");
-  const openAboutBtn = document.getElementById("nav-about-btn");
-  const closeAboutBtn = document.getElementById("close-about-btn");
-  const aboutPrevBtn = document.getElementById("about-prev-btn");
-  const aboutNextBtn = document.getElementById("about-next-btn");
-  const aboutStepItems = document.querySelectorAll(".about-step-item");
-  const aboutPanes = document.querySelectorAll(".about-pane");
-  let aboutStep = 1;
-  const maxAboutStep = 3;
-
-  if (openAboutBtn && aboutModal) {
-    openAboutBtn.addEventListener("click", () => {
-      document.querySelectorAll(".nav-item").forEach(btn => btn.classList.remove("active"));
-      openAboutBtn.classList.add("active");
-      aboutModal.classList.add("show");
-      setAboutStep(1);
-    });
-
-    closeAboutBtn.addEventListener("click", () => {
-      aboutModal.classList.remove("show");
-      openAboutBtn.classList.remove("active");
-    });
-
-    aboutModal.addEventListener("click", (e) => {
-      if (e.target === aboutModal) {
-        aboutModal.classList.remove("show");
-        openAboutBtn.classList.remove("active");
-      }
-    });
-
-    if (aboutNextBtn) {
-      aboutNextBtn.addEventListener("click", () => {
-        if (aboutStep < maxAboutStep) {
-          setAboutStep(aboutStep + 1);
-        } else {
-          aboutModal.classList.remove("show");
-          openAboutBtn.classList.remove("active");
-        }
-      });
-    }
-
-    if (aboutPrevBtn) {
-      aboutPrevBtn.addEventListener("click", () => {
-        if (aboutStep > 1) {
-          setAboutStep(aboutStep - 1);
-        }
-      });
-    }
-
-    aboutStepItems.forEach(item => {
-      item.addEventListener("click", () => {
-        setAboutStep(parseInt(item.dataset.step));
-      });
-    });
-
-    function setAboutStep(step) {
-      aboutStep = step;
-      aboutStepItems.forEach(item => {
-        if(parseInt(item.dataset.step) === step) {
-          item.classList.add("active");
-        } else {
-          item.classList.remove("active");
-        }
-      });
-      aboutPanes.forEach(pane => {
-        if(pane.id === `about-step-${step}`) {
-          pane.classList.add("active");
-        } else {
-          pane.classList.remove("active");
-        }
-      });
-      if (aboutPrevBtn) {
-        aboutPrevBtn.style.visibility = step === 1 ? "hidden" : "visible";
-      }
-      
-      if (aboutNextBtn) {
-        if (step === maxAboutStep) {
-          aboutNextBtn.innerHTML = '<span data-i18n="common.close">閉じる</span>';
-        } else {
-          aboutNextBtn.innerHTML = '<span data-i18n="common.next">次へ</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>';
-        }
-      }
-      
-      if (window.i18n && window.i18n.applyLocale) {
-        window.i18n.applyLocale();
-      }
-    }
-  }
 });

@@ -150,6 +150,72 @@ fn compute_cf_fingerprint(data: &[u8]) -> u32 {
 
 // ── ヘルパー関数 ─────────────────────────────────────────
 
+fn extract_mod_name(path: &Path) -> Option<String> {
+    use std::fs::File;
+    use zip::ZipArchive;
+    use std::io::Read;
+
+    let file = File::open(path).ok()?;
+    let mut archive = ZipArchive::new(file).ok()?;
+
+    // Fabric
+    if let Ok(mut fabric_file) = archive.by_name("fabric.mod.json") {
+        let mut content = String::new();
+        if fabric_file.read_to_string(&mut content).is_ok() {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(name) = json.get("name").and_then(|v| v.as_str()) {
+                    return Some(name.to_string());
+                }
+            }
+        }
+    }
+
+    // Forge / NeoForge
+    let toml_paths = ["META-INF/neoforge.mods.toml", "META-INF/mods.toml", "mods.toml", "neoforge.mods.toml"];
+    for toml_path in toml_paths {
+        if let Ok(mut toml_file) = archive.by_name(toml_path) {
+            let mut content = String::new();
+            if toml_file.read_to_string(&mut content).is_ok() {
+                if let Ok(toml_val) = content.parse::<toml::Value>() {
+                    if let Some(mods) = toml_val.get("mods").and_then(|v| v.as_array()) {
+                        if let Some(first_mod) = mods.first() {
+                            if let Some(name) = first_mod.get("displayName").and_then(|v| v.as_str()) {
+                                return Some(name.to_string());
+                            } else if let Some(mod_id) = first_mod.get("modId").and_then(|v| v.as_str()) {
+                                return Some(mod_id.to_string());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Older Forge
+    if let Ok(mut info_file) = archive.by_name("mcmod.info") {
+        let mut content = String::new();
+        if info_file.read_to_string(&mut content).is_ok() {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(arr) = json.as_array() {
+                    if let Some(first) = arr.first() {
+                        if let Some(name) = first.get("name").and_then(|v| v.as_str()) {
+                            return Some(name.to_string());
+                        }
+                    }
+                } else if let Some(mod_list) = json.get("modList").and_then(|v| v.as_array()) {
+                    if let Some(first) = mod_list.first() {
+                        if let Some(name) = first.get("name").and_then(|v| v.as_str()) {
+                            return Some(name.to_string());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    None
+}
+
 async fn compute_sha512(path: &Path) -> Result<String, String> {
     let data = tokio::fs::read(path)
         .await
@@ -363,7 +429,19 @@ async fn sync_mods(app: AppHandle, game_path: String, cf_api_key: Option<String>
             continue;
         }
 
-        // 3. どちらにも見つからない
+        // 3. どちらにも見つからない場合はGoogle検索へのリンクを付与
+        let file_path_clone = game_dir.join(target_dir).join(file_name);
+        let extracted_name = tokio::task::spawn_blocking(move || {
+            extract_mod_name(&file_path_clone)
+        }).await.unwrap_or(None);
+
+        let display_name = extracted_name.unwrap_or_else(|| {
+            Path::new(&file_name).file_stem().and_then(|s| s.to_str()).unwrap_or(&file_name).to_string()
+        });
+        
+        let search_query = format!("{} minecraft mod", display_name).replace(" ", "+");
+        let google_search_url = format!("https://www.google.com/search?q={}", search_query);
+
         manifest.push(ModEntry {
             file_name: file_name.clone(),
             target_dir: target_dir.clone(),
@@ -372,7 +450,7 @@ async fn sync_mods(app: AppHandle, game_path: String, cf_api_key: Option<String>
             project_name: None,
             version_number: None,
             source: "unknown".to_string(),
-            page_url: None,
+            page_url: Some(google_search_url),
             matched: false,
         });
     }
@@ -623,11 +701,25 @@ async fn clear_r2_config(app: AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+#[tauri::command]
+async fn read_file_content(path: String) -> Result<String, String> {
+    tokio::fs::read_to_string(&path)
+        .await
+        .map_err(|e| format!("ファイル読み込みエラー: {}", e))
+}
+
+#[tauri::command]
+fn open_browser(app: AppHandle, url: String) -> Result<(), String> {
+    use tauri_plugin_opener::OpenerExt;
+    app.opener().open_url(url, None::<&str>).map_err(|e| e.to_string())
+}
+
 // ── エントリポイント ─────────────────────────────────────
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
@@ -638,7 +730,9 @@ pub fn run() {
             upload_to_r2,
             save_r2_config,
             load_r2_config,
-            clear_r2_config
+            clear_r2_config,
+            read_file_content,
+            open_browser
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

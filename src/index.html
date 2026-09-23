@@ -105,7 +105,7 @@
       </header>
 
       <!-- 共通: ディレクトリ設定 -->
-      <section class="control-panel glass-card" style="margin-bottom: 0;">
+      <section id="common-game-dir" class="control-panel glass-card" style="margin-bottom: 0;">
         <div class="input-group">
           <label for="game-path-input">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -359,6 +359,20 @@
             </div>
           </div>
         </section>
+
+        <!-- R2 アップロード提案パネル (generate内) -->
+        <section id="r2-upload-prompt" class="r2-upload-prompt glass-card" style="display: none;">
+          <div class="r2-upload-header">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span id="r2-upload-title" data-i18n="r2_upload.title">未マッチのMODをR2にアップロードしますか？</span>
+          </div>
+          <p id="r2-upload-desc" class="r2-upload-desc"></p>
+          <div id="r2-upload-actions" class="r2-upload-actions"></div>
+        </section>
       </section>
 
       <!-- プログレスバー -->
@@ -372,7 +386,7 @@
         </div>
       </section>
 
-      <!-- プログレスバー -->
+      <!-- 結果セクション -->
       <section class="results-section glass-card" id="results-section" style="display: none;">
         <div class="section-header">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -404,184 +418,104 @@
         </div>
       </section>
 
-      <!-- R2 アップロード提案パネル -->
-      <section id="r2-upload-prompt" class="r2-upload-prompt glass-card" style="display: none;">
-        <div class="r2-upload-header">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
-          </svg>
-          <span id="r2-upload-title" data-i18n="r2_upload.title">未マッチのMODをR2にアップロードしますか？</span>
-        </div>
-        <p id="r2-upload-desc" class="r2-upload-desc"></p>
-        <div id="r2-upload-actions" class="r2-upload-actions"></div>
-      </section>
-    </main>
-  
-  <!-- R2 Setup Guide Modal -->
-  <div id="r2-guide-modal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title" data-i18n="settings.r2.title">Cloudflare R2 (非公式MODアップロード用)</h3>
-        <button class="modal-close" id="close-r2-guide-btn" title="閉じる" data-i18n-attr="title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-sidebar" id="r2-guide-steps-list">
-          <div class="step-nav-item active" data-step="1">
-            <span class="step-nav-number">1</span>
-            <span data-i18n="settings.r2.step_nav_1">バケット作成</span>
-          </div>
-          <div class="step-nav-item" data-step="2">
-            <span class="step-nav-number">2</span>
-            <span data-i18n="settings.r2.step_nav_2">パブリックURL</span>
-          </div>
-          <div class="step-nav-item" data-step="3">
-            <span class="step-nav-number">3</span>
-            <span data-i18n="settings.r2.step_nav_3">CORS設定</span>
-          </div>
-          <div class="step-nav-item" data-step="4">
-            <span class="step-nav-number">4</span>
-            <span data-i18n="settings.r2.step_nav_4">APIトークン</span>
-          </div>
-        </div>
-        <div class="modal-main" id="r2-guide-content">
-          <!-- Step 1 -->
-          <div class="step-pane active" id="r2-step-1">
-            <p><span data-i18n="settings.r2.step1">1. Cloudflare ダッシュボードにログインし、「R2」を開きます。</span> <a class="url-link" href="https://dash.cloudflare.com/" target="_blank">Cloudflare ダッシュボード</a></p>
-            <p><span data-i18n="settings.r2.step2">2. <b>「バケットの作成」</b> から好きな名前 (例: <code>my-mod-repo</code>) で作成します。これが <b>Bucket Name</b> になります。</span></p>
-            <img class="step-image" src="../.user_uploaded/r2_step1_bucket_1790028689441.jpg" alt="Create Bucket" />
-          </div>
-          <!-- Step 2 -->
-          <div class="step-pane" id="r2-step-2">
-            <p><span data-i18n="settings.r2.step3">3. 作成したバケットの設定から <b>R2.dev サブドメイン</b> を「許可」にします。</span></p>
-            <p><span style="color: #ef4444; font-weight: bold;" data-i18n="settings.r2.step3_warn">※ 注意: これを許可すると、URLを知っている全員がMODをダウンロード可能になります。プライベートなファイルは置かないでください。</span></p>
-            <p><span data-i18n="settings.r2.step3_url">表示されたパブリックURL (<code>https://pub-xxxx.r2.dev</code> 等) が <b>Public URL</b> になります。</span></p>
-            <img class="step-image" src="../.user_uploaded/r2_step2_public_1790028699292.jpg" alt="Public URL" />
-          </div>
-          <!-- Step 3 -->
-          <div class="step-pane" id="r2-step-3">
-            <p><span data-i18n="settings.r2.step4">4. (重要) 設定画面の <b>CORS ポリシー</b> で「CORS ポリシーの追加」から以下を設定してください。これがないと他の人がダウンロードできません。</span></p>
-            <ul>
-              <li data-i18n="settings.r2.step4_origin">・許可されるオリジン: <code>*</code> または <code>tauri://localhost</code></li>
-              <li data-i18n="settings.r2.step4_method">・許可されるメソッド: <code>GET</code></li>
-            </ul>
-            <img class="step-image" src="../.user_uploaded/r2_step3_cors_1790028711406.jpg" alt="CORS Policy" />
-          </div>
-          <!-- Step 4 -->
-          <div class="step-pane" id="r2-step-4">
-            <p><span data-i18n="settings.r2.step5">5. R2トップページ右上の <b>R2 API トークンの管理</b> から「API トークンの作成」をします。</span></p>
-            <p><span data-i18n="settings.r2.step6">6. 「オブジェクト 読み取りと書き込み」権限で作成します。<br>表示された <b>アクセスキー ID</b> を <b>アクセスキー</b> の欄にコピーしてください。</span></p>
-            <p><span data-i18n="settings.r2.step7">7. 同様に <b>シークレットアクセスキー</b> をコピーして一番上の欄に貼り付けます。</span></p>
-            <img class="step-image" src="../.user_uploaded/r2_step4_token_1790028722004.jpg" alt="API Token" />
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-ghost" id="r2-guide-prev-btn" style="visibility: hidden;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-          <span data-i18n="common.prev">前へ</span>
-        </button>
-        <button class="btn-primary" id="r2-guide-next-btn">
-          <span data-i18n="common.next">次へ</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </div>
 
-  <!-- About/Help Modal -->
-  <div id="about-modal" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title" data-i18n="about.title">ModLinker の使い方</h3>
-        <button class="modal-close" id="close-about-btn" title="閉じる" data-i18n-attr="title">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="modal-sidebar" id="about-steps-list">
-          <div class="step-nav-item active about-step-item" data-step="1">
-            <span class="step-nav-number">1</span>
-            <span data-i18n="about.nav_1">はじめに</span>
-          </div>
-          <div class="step-nav-item about-step-item" data-step="2">
-            <span class="step-nav-number">2</span>
-            <span data-i18n="about.nav_2">ダウンロード機能</span>
-          </div>
-          <div class="step-nav-item about-step-item" data-step="3">
-            <span class="step-nav-number">3</span>
-            <span data-i18n="about.nav_3">マニフェスト生成機能</span>
-          </div>
-        </div>
-        <div class="modal-main" id="about-content">
-          <!-- Step 1 -->
-          <div class="step-pane about-pane active" id="about-step-1">
-            <h4 style="margin-top:0; margin-bottom:16px; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-              <span data-i18n="about.step1_title">ModLinker へようこそ！</span>
-            </h4>
-            <p style="line-height: 1.6; margin-bottom: 12px;"><span data-i18n="about.step1_1">ModLinkerは、お友達やサーバーのメンバーと一緒に、MinecraftのMOD構成をかんたんに揃えるためのツールです。</span></p>
-            <p style="line-height: 1.6;"><span data-i18n="about.step1_2">「マニフェストファイル (JSON)」という設計図をやり取りするだけで、みんなと同じMOD環境をすぐに作ることができます！</span></p>
+      <!-- 4. Docs Mode -->
+      <section id="panel-docs" class="mode-panel" style="display: none;">
+        
+        <div class="docs-container">
+          <div class="docs-sidebar">
+            <ul id="docs-nav-list">
+              <li class="docs-nav-item active" data-target="docs-intro">はじめに</li>
+              <li class="docs-nav-item" data-target="docs-player">【プレイヤー向け】ダウンロード手順</li>
+              <li class="docs-nav-item" data-target="docs-creator">【制作者向け】マニフェスト生成手順</li>
+              <li class="docs-nav-item" data-target="docs-r2">【制作者向け】Cloudflare R2 設定 (野良MOD)</li>
+            </ul>
           </div>
           
-          <!-- Step 2 -->
-          <div class="step-pane about-pane" id="about-step-2">
-            <h4 style="margin-top:0; margin-bottom:16px; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              <span data-i18n="about.step2_title">他の人の環境を取り込む（ダウンロード）</span>
-            </h4>
-            <p style="line-height: 1.6; margin-bottom: 16px;"><span data-i18n="about.step2_1">配られたマニフェストファイルを使って、必要なMODを一気にダウンロードします。</span></p>
-            <ul style="padding-left: 20px; line-height: 1.8; margin-bottom: 16px;">
-              <li><span data-i18n="about.step2_list1">📂 <b>ファイルを選ぶだけ</b>：複雑な操作は不要です。</span></li>
-              <li><span data-i18n="about.step2_list2">⚡ <b>差分だけをダウンロード</b>：すでに入っているMODはスキップするのでとても速いです。</span></li>
-            </ul>
-            <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(0,0,0,0.1);">
-              <span data-i18n="about.step2_note" style="color: var(--text-secondary); font-size: 13px;">💡 <b>ヒント：</b> 「ダウンロード」タブからJSONファイルを選び、「差分をチェック」を押すだけでOKです！</span>
+          <div class="docs-content-area" id="docs-content-area">
+            
+            <!-- はじめに -->
+            <div id="docs-intro" class="docs-section">
+              <h3 data-i18n="about.step1_title">ModLinker へようこそ！</h3>
+              <p style="color: var(--text-secondary); margin-bottom: 24px;">ModLinkerのすべての機能とセットアップ手順をここで確認できます。</p>
+              <p data-i18n="about.step1_1">ModLinkerは、お友達やサーバーのメンバーと一緒に、MinecraftのMOD構成をかんたんに揃えるためのツールです。</p>
+              <p data-i18n="about.step1_2">「マニフェストファイル (JSON)」という設計図をやり取りするだけで、みんなと同じMOD環境をすぐに作ることができます！</p>
+              <p>ZIPファイルでの配布とは違い、ModrinthやCurseForgeから直接ダウンロードするため著作権的にクリーンであり、配布の手間も大幅に削減されます。</p>
             </div>
-          </div>
-          
-          <!-- Step 3 -->
-          <div class="step-pane about-pane" id="about-step-3">
-            <h4 style="margin-top:0; margin-bottom:16px; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-              <span data-i18n="about.step3_title">自分の環境を配る（マニフェスト生成）</span>
-            </h4>
-            <p style="line-height: 1.6; margin-bottom: 16px;"><span data-i18n="about.step3_1">今のあなたの「mods」フォルダの中身をリストアップし、みんなに配るための設計図を作ります。</span></p>
-            <ul style="padding-left: 20px; line-height: 1.8; margin-bottom: 16px;">
-              <li><span data-i18n="about.step3_list1">🌐 <b>公式MODは自動リンク</b>：Modrinth などの配布元を自動で特定します。</span></li>
-              <li><span data-i18n="about.step3_list2">☁️ <b>非公式MODはクラウドへ</b>：自作MODなどは Cloudflare R2 に自動でアップロードして共有できます。</span></li>
-            </ul>
+
+            <!-- プレイヤー向け -->
+            <div id="docs-player" class="docs-section">
+              <h3 data-i18n="about.step2_title">他の人の環境を取り込む（ダウンロード）</h3>
+              <p data-i18n="about.step2_1">配られたマニフェストファイルを使って、必要なMODを一気にダウンロードします。</p>
+              <ul>
+                <li data-i18n="about.step2_list1"><b>ファイルを選ぶだけ</b>：複雑な操作は不要です。</li>
+                <li data-i18n="about.step2_list2"><b>差分だけをダウンロード</b>：すでに入っているMODはスキップするのでとても速いです。</li>
+              </ul>
+              <div class="note-box">
+                <span data-i18n="about.step2_note">💡 <b>ヒント：</b> 「ダウンロード」タブからJSONファイルを選び、「差分をチェック」を押すだけでOKです！</span>
+              </div>
+            </div>
+
+            <!-- 制作者向け -->
+            <div id="docs-creator" class="docs-section">
+              <h3 data-i18n="about.step3_title">自分の環境を配る（マニフェスト生成）</h3>
+              <p data-i18n="about.step3_1">今のあなたの「mods」フォルダの中身をリストアップし、みんなに配るための設計図を作ります。</p>
+              <ul>
+                <li data-i18n="about.step3_list1"><b>公式MODは自動リンク</b>：Modrinth などの配布元を自動で特定します。</li>
+                <li data-i18n="about.step3_list2"><b>非公式MODはクラウドへ</b>：自作MODなどは Cloudflare R2 に自動でアップロードして共有できます。</li>
+              </ul>
+            </div>
+
+            <!-- R2 設定 -->
+            <div id="docs-r2" class="docs-section">
+              <h3 data-i18n="settings.r2.title">Cloudflare R2 (非公式MODアップロード用)</h3>
+              <p>Cloudflare R2は、月10GBまで無料で使える高速なクラウドストレージです。<br>公式にないMOD（野良MOD）を配布したい場合は、以下の手順でセットアップしてください。</p>
+              
+              <h4>1. バケットの作成</h4>
+              <p><span data-i18n="settings.r2.step1">Cloudflare ダッシュボードにログインし、「R2」を開きます。</span> <a class="url-link" href="https://dash.cloudflare.com/" target="_blank">Cloudflare ダッシュボード</a></p>
+              <p><span data-i18n="settings.r2.step2"><b>「バケットの作成」</b> から好きな名前 (例: <code>my-mod-repo</code>) で作成します。これが <b>Bucket Name</b> になります。</span></p>
+              
+              <h4>2. パブリックURLの設定</h4>
+              <p><span data-i18n="settings.r2.step3">作成したバケットの設定から <b>R2.dev サブドメイン</b> を「許可」にします。</span></p>
+              <p><span class="text-error" data-i18n="settings.r2.step3_warn">※ 注意: これを許可すると、URLを知っている全員がMODをダウンロード可能になります。プライベートなファイルは置かないでください。</span></p>
+              <p><span data-i18n="settings.r2.step3_url">表示されたパブリックURL (<code>https://pub-xxxx.r2.dev</code> 等) が <b>Public URL</b> になります。</span></p>
+              
+              <h4>3. CORSポリシーの設定 (重要)</h4>
+              <p><span data-i18n="settings.r2.step4">設定画面の <b>CORS ポリシー</b> で「CORS ポリシーの追加」から以下を設定してください。これがないと他の人がダウンロードできません。</span></p>
+              <div class="code-block">
+                <button class="copy-btn" data-copy='[
+  {
+    "AllowedOrigins": [
+      "*",
+      "tauri://localhost"
+    ],
+    "AllowedMethods": [
+      "GET"
+    ]
+  }
+]' data-i18n="common.copy">コピー</button>
+                <pre><code>[
+  {
+    "AllowedOrigins": [ "*", "tauri://localhost" ],
+    "AllowedMethods": [ "GET" ]
+  }
+]</code></pre>
+              </div>
+
+              <h4>4. APIトークンの作成</h4>
+              <p><span data-i18n="settings.r2.step5">R2トップページ右上の <b>R2 API トークンの管理</b> から「API トークンの作成」をします。</span></p>
+              <p><span data-i18n="settings.r2.step6">「オブジェクト 読み取りと書き込み」権限で作成します。<br>表示された <b>アクセスキー ID</b> を <b>アクセスキー</b> の欄にコピーしてください。</span></p>
+              <p><span data-i18n="settings.r2.step7">同様に <b>シークレットアクセスキー</b> をコピーして一番上の欄に貼り付けます。</span></p>
+              
+            </div>
+            
+            <div style="height: 100px;"></div> <!-- Scroll padding -->
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-ghost" id="about-prev-btn" style="visibility: hidden;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-          <span data-i18n="common.prev">前へ</span>
-        </button>
-        <button class="btn-primary" id="about-next-btn">
-          <span data-i18n="common.next">次へ</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </div>
-</body>
+      </section>
+
+    </main>
+
+  
+  </body>
 </html>
